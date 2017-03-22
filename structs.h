@@ -13,4 +13,5 @@ typedef struct t {
     int fin;
 } lista;
 
+
 #endif

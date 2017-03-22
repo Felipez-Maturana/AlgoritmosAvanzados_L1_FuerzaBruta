@@ -2,416 +2,452 @@
 #include <stdio.h>
 #include <string.h>
 
-lista InsertSort(lista L) // Funcion que permite ordenar una lista a traves del algoritmo de insercion O(n)=n^2. T(n) = 3n^2 + 12n + 4.
+
+lista * appendLista(lista L1, lista * ListaEnlazada, int * CantidadElementos)
 {
-    int i,j,aux,MINindice,MINvalor;
-    for(i=0;i<=L.fin-2;i++)
-    {
-        MINindice=i;
-        MINvalor=obtener(L,i);
-
-        for(j=i+1;j<=L.fin-1;j++)// en la i-Esima iteraciOn
-        {
-            if(obtener(L,j) < MINvalor)
-            {
-                MINindice= j;
-                MINvalor= obtener(L,j);
-            }
-        }
-        if(MINindice != i)
-        {
-            aux=obtener(L,i);
-
-            L=insertar(L, obtener(L,MINindice),i); //inserta el i-esimo elemtno en su posicion correcta, entre los i-1 elementos anteriores 
-            //mostrar(L);
-            L=borrar(L,i+1);
-            //mostrar(L);
-            L=insertar(L, aux ,MINindice);
-            L=borrar(L,MINindice+1);
-
-        }
-    }
-
-    return L;
+	* CantidadElementos = *CantidadElementos + 1; 
+	
+	ListaEnlazada = (lista *) realloc(ListaEnlazada,*CantidadElementos*sizeof(lista));
+	
+	ListaEnlazada[*CantidadElementos-1] = L1;
+	
+	return ListaEnlazada;
+	
 }
 
-lista EliminarRepetidos(lista L)// Funcion que elimina los repetidos en una lista previamente ordenada O(n)=n^2	T(n) = 3n^2 + 17n + 2.
+
+void mostrarListaEnlazada(lista * ListaEnlazada, int CantidadElementos)
 {
-    int i;
-    for(i =0; i < L.fin; i++)
-    {
-        if(obtener(L,i)==obtener(L,i+1)) //Si dos elementos son iguales de forma consecutiva (Se asume que estan ordenados)
-        {
-            L=borrar(L,i+1); // Elimina el elemento.
-            i=i-1;
-            if(i<0)
-            {
-				i=0;
-			}
-        }
-    }
-    L=insertar(L,' ',L.fin);//Segun el algoritmo de cifrado es necesario que el alfabeto a utilizar luego de ser ordenado posea un espacio en el ultimo elemento
-    
-    if(obtener(L,0)==32)
-	{
-		L=borrar(L,0); //Si el primer elemento es un espacio este se borra, ya que el espacio debe ir en ultimo lugar pero el espacio en ASCII es 32, siempre estara primero.
-	}
-    return L;
-}
-
-int verificarVocal(int elemento)   //Retorna -1 si es una vocal y -2 si es una consontante. O(n) = 1. T(n) = 14.
-{
-    if(elemento==32 || elemento==65 || elemento==69 || elemento==73 || elemento==79 || elemento==85 || elemento==97 || elemento==101 || elemento==105 || elemento==111 || elemento==117)
-    {
-		// los numeros en esta bifurcacion representan las vocales, tanto minusculas y mayusculas. Y el espacio = 32
-        return -1;
-    }
-    else
-    {
-		// si no es vocal, retorna -2
-        return -2;
-    }
-}
-
-lista moverDerecha(lista L) //Funcion que desplaza una lista a la derecha una vez O(n)=n^2. T(n) = 3n^2 + 11n + 2.
-{
-    int i;
-    lista L2;
-    L2=crearLista(); //Se crea la lista que se retornarA 
-
-    L2=insertar(L2, obtener(L,L.fin-1) ,0); //Se inserta el ultimo elemento en el primero (Lista circular)
-    for(i=0; i<L.fin-1 ;i++)
-    {
-        L2=insertar(L2, obtener(L,i),i+1); //Se corren todos los elementos una posicion a la derecha
-    }
-
-    return L2;
-}
-
-lista moverIzquierda(lista L) //Funcion que desplaza una lista a la izquierda una vez O(n)=n^2. T(n) = 3n^2 + 11n + 2.
-{
-    int i;
-
-    lista L2;
-    L2=crearLista();
-
-    for(i=1; i<=L.fin-1 ;i++)
-    {
-        L2=insertar(L2, obtener(L,i),i-1); // Se desplazan todos los elementos una posicion hacia la izquierda
-    }
-
-    L2=insertar(L2, obtener(L,0) , L.fin-1); //Se inserta el primer elemento en la ultima posicion
-    return L2;
-}
-
-int BuscarEspacio(lista L1,int a) //Funcion que retorna la posicion del entero (caracter ASCII) en la lista L1. O(n)=n^2. T(n) = 3n^2 + 6n + 2.
-{
-    int i=0;
-    int z=0;
-
-    for(i=0;i<L1.fin;i++)
-    {
-        z=obtener(L1,i); //z es el entero con el cual se compara el entero que entra como argumento en la funcion.
-        if(z==a)
-        {
-            return i; // Si lo encontrO, retorna la posicion que ocupa el entero z.
-        }
-    }
-    //Si el elemento no estA, generalmente en el alfabeto el programa finalizarA
-    printf("El elemento que estAs buscando no se encuentra en la lista buscada\n El programa se cerrarA\n");
-    printf("Presione una tecla para salir...");
-    getchar();
-    exit(0);
-    
-    return -1;
-}
-
-int calcularDesfase(lista L1,lista L2) //Funcion que calcula el desfase entre dos listas O(n)=n. T(n) = n+7.
-{
-    int a=0;
-    int b=0;
-    int resultado=0;
-    //El espacio (de referencia) siempre se encuentra en la ultima posicion del Alfabeto utilizado
-    a=L1.fin-1;  //32 corresponde al ASCII de espacio ' '
-    b=BuscarEspacio(L2,32);
-    //Resta la posicion del espacio en el alfabeto, con la posicion del espacio que actualmente ocupa en la Lista que contiene las letras del cifrado
-
-    resultado=a-b;
-
-    if(resultado<0)
-    {
-        resultado=-resultado;
-    }
-
-    return resultado;
-}
-
-lista moverNDerecha(lista L, int veces) //Funcion que mueve N veces una lista a la derecha O(n)=n^2. T(n) = n*(3n^2 + 11n + 2).
-{
-	lista L1;
-	L1=L;
 	int i;
-	for(i=0;i<veces;i++)
+	for(i=0;i<CantidadElementos;i++)
 	{
-		L1=moverDerecha(L1);
-		
+		printf("%d: ",i+1);
+		mostrar(ListaEnlazada[i]);
 	}
-	return L1;
 }
 
-lista moverNIzquierda(lista L, int veces) //Funcion que mueve N veces una lista a la izquierda O(n)=n^3. T(n) = n*(3n^2 + 11n + 2).
+void imprimirArchivoLista(FILE * archivoSalida, lista Combinacion)
 {
-	lista L1;
-	L1=L;
+	int indice = Combinacion.cabeza;
+    while(indice != NULO) {
+        fprintf(archivoSalida,"%c", Combinacion.arreglo[indice].elemento);
+        indice = Combinacion.arreglo[indice].siguiente;
+    }
+    fprintf(archivoSalida,"\n");
+}
+
+
+
+void imprimirArchivoListaBidimensional(FILE * archivoSalida, lista * ListaEnlazada, int CantidadElementos)
+{
 	int i;
-	for(i=0;i<veces;i++)
+	for(i=0;i<CantidadElementos;i++)
 	{
-		L1=moverIzquierda(L1);
+		fprintf(archivoSalida,"%d: ",i+1);
+		//mostrar(ListaEnlazada[i]);
+		imprimirArchivoLista(archivoSalida,ListaEnlazada[i]);
 	}
+	printf("El programa ha finalizado de forma exitosa\nLas combinaciones vAlidas se encuentran en el archivo Salida.out alojado en la misma carpeta que el cOdigo.");
 	
-	return L1;
 }
 
-lista Codificar(lista L) //Funcion que se encarga de codificar una lista O(n)=n^4. T(n) en el peor de los casos (solo vocales), realiza dos veces el llamado a InsertSort y EliminarRepetidos, ademas de n veces el llamado a moverNIzquierda (n*n^3).
+//Funcion recibe como entrada una lista con los caracteres a ocupar en la fuerza bruta, ademAs de un puntero a entero donde se mantendrA un registro de la cantidad
+//de listas que contendrA la salida de este algoritmo, es decir, la cantidad de combinaciones.
+lista * fuerzaBrutaPassword(lista Caracteres, int * CantidadListas)
 {
-	lista LLetras = crearLista();
-	lista LCodificada = crearLista();
-	lista LLetrasCodificada = crearLista();
-	
-	FILE * Salida;
-	
-	LLetras = InsertSort(L); // O(n)=n^2
-	LLetras = EliminarRepetidos(LLetras); //O(n)=n^2
-	LCodificada = InsertSort(L); //O(n)=n^2
-	LCodificada = EliminarRepetidos(LCodificada); //O(n)=n^2
-	//mostrar(LLetras);
-	//mostrar(LCodificada);
-	Salida = fopen("Salida.out","w");
-	int a=0; //SerA el caracter de la lista original 
-	int Pos=0; //PosiciOn en la que se encuentra el caracter de la lista original en la lista Letras
-	int CaracterLC=0; //Valor ASCII del caracter que se encuentra en la PosiciOn pos en la Lista Codificada
-	int i=0;
-	for(i=0;i<L.fin;i++)
-	{
-		//Obtengo el caracter que se codificara en la lista original
-		
-		a=obtener(L,i);
-		//printf("El caracter de la lista original a codificar es %c\n",a);
-		
-		Pos = BuscarEspacio(LLetras,a); //O(n)=1
-		//printf("El caracter buscado se encuentra en la posicion %d\n",Pos);
-		
-		CaracterLC = obtener(LCodificada,Pos); //O(n)=n
-		//printf("El caracter (en la misma posicion) en la lista Codificada es %c\n",CaracterLC);
-		
-		
-		LLetrasCodificada = insertar( LLetrasCodificada,CaracterLC,i);
-		
-		
-		if( verificarVocal(CaracterLC) == -1)
-		{
-			//printf("3 Movimientos a la izquierda: ");
-			LCodificada = moverNIzquierda(LCodificada,3); //O(n)=n^3
-			//mostrar(LCodificada);
-		}
-		else if( verificarVocal(CaracterLC) == -2)
-		{
-			//printf("1 Movimiento a la derecha: ");
-			LCodificada = moverDerecha(LCodificada); //O(n)=n^2
-			//mostrar(LCodificada);
-		}
-		  
-	}
-	
-	//printf("El alfabeto utilizado:\n");
-	//mostrar(LLetras);
-	//printf("La Lista Codificada:\n");
-	//mostrar(LCodificada);
-	
-	printf("La frase o palabra cifrada es: \n");
-	mostrar(LLetrasCodificada);
-	for(i=0;i<LLetrasCodificada.fin;i++)
-	{
-		fprintf(Salida,"%c", obtener(LLetrasCodificada,i) );
-	}
-	fprintf(Salida,"\n");
-	int desfase = calcularDesfase(LLetras,LCodificada);
-	//printf("El desfase entre el alfabeto y la lista codificada es: %d\n",desfase);
-	fprintf(Salida,"%d",desfase);
-	
-	fclose(Salida);
-	return LLetrasCodificada;
-}
+	//Se crea y se asigna memoria a un puntero de la estructura lista (structs.h), se le asigna la memoria para una lista.
+	lista * Resultado = (lista *) malloc(sizeof(lista));
+    *CantidadListas = 0;
+    lista L1;
 
-lista Decodificar(int desfase, lista LDescifrar, lista Alfabeto) //Funcion que se encarga de decodificar una lista O(n)=n^4
-{
-	//2 llamados a InsertSort y Eliminar Repetidos, ademas de mover N izquierda para iniciar el proceso de descifrado y N mover derecha en el mismo proceso de descifrado.
-	lista resultado = crearLista();
-	FILE * Salida;
-	Salida = fopen("Salida.out","w");
+    int a,b,c,d,e,f,g,h;
+	//8 For anidados, cada uno por la cantidad de caracteres que posee la contrasenha
 	
-	lista Alfabeto2= InsertSort(Alfabeto); //O(n)=n^2
-	Alfabeto2 = EliminarRepetidos(Alfabeto2); //O(n)=n^2
-	
-	//printf("\nEL ALFABETO UTILIZADO: ");
-	//mostrar(Alfabeto2);
-	lista LLetras = Alfabeto2;
-	
-	//printf("El alfabeto a utilizar tiene %d, LLetras tiene %d\n",Alfabeto2.fin,LLetras.fin);
-	//printf("*%c*\n",obtener(Alfabeto2,0)); //O(n)=n
-	if(desfase >0)
-	{
-		LLetras = moverNIzquierda(LLetras,desfase);
-	}
-	
-	//printf("LLetras INICIAL :");
-	//mostrar(LLetras);
-	//printf("El largo de L.Descifrar es %d\n",LDescifrar.fin);
-	int a=0;
-	int i=0;
-	int pos=0;
-	int z=0;
-	
-	int AUX[LDescifrar.fin+1];
-	
-	for(i= LDescifrar.fin-1 ; i>=0 ;i--)
-	{
-		a=obtener(LDescifrar,i);
-		//printf("El elemento obtenido en i = %d es : %c\n",i,a);
-		z= verificarVocal(a);
-		if(z==-1)
-		{
-			LLetras = moverNDerecha(LLetras,3); //O(n)=n^3
-		}
-		else if(z==-2)
-		{
-			LLetras = moverIzquierda(LLetras); //O(n)=n^2
-		}
+    for(a=0;a< Caracteres.fin;a++)
+    {
 		
-		//mostrar(LLetras);
+		//Se crea la lista que contendrA la combinacion n-Esima de la aplicacion de la fuerza bruta
+		L1 = crearLista();
 		
-		pos = BuscarEspacio(LLetras,a); //O(n)=n^2
-		//printf("El termino buscado en la pos %d es %c ?\n",pos,obtener(Alfabeto2,pos));
-
-		AUX[i]=obtener(Alfabeto2,pos);
-	}
-	
-	for(i=0;i<LDescifrar.fin;i++)
-	{
-		resultado = insertar(resultado, AUX[i],i);
-	}
-	
-	for(i=0;i<resultado.fin;i++)
-	{
-		fprintf(Salida,"%c", obtener(resultado,i) );
-	}
-	int desfase2= calcularDesfase(Alfabeto2,LLetras);
-	fprintf(Salida,"\n");
-	fprintf(Salida,"%d",desfase2);	
-	
-	fclose(Salida);
-	
-	return resultado;
-}
- 
-void LeerArchivo() //Funcion que se encarga de leer un archivo y dar la intruccion de codificar o decodificar segun sea el caso
-{
-	FILE * Entrada;
-	char Cabecera[11];
-	char * Cifrado = "Cifrado";
-	char * Descifrado = "Descifrado";
-	lista PalabraACifrar = crearLista();
-	
-	//char * Descifrado = "Descifrado";
-	char Caracter;
-	Entrada = fopen("Entrada.in","r");
-	
-	if(Entrada != NULL)
-	{
-		fscanf(Entrada,"%s",Cabecera);
-		
-		if(strncmp(Cabecera, Cifrado, 7) ==0 )
+		for(b=0;b< Caracteres.fin;b++)
 		{
-			printf("\n********** INICIO DEL PROCESO DE CIFRADO **********\n");
-			
-			int contador=0;
-			while(!feof(Entrada))
+			for(c=0;c< Caracteres.fin;c++)
 			{
-				fscanf(Entrada,"%c",&Caracter);
-				if((Caracter >= 65 && Caracter <=90) || (Caracter >= 67 && Caracter <=122) || Caracter==32 ) 	// Solo se admiten Letras (mayUsculas o minUsculas)
+				for(d=0;d< Caracteres.fin;d++)
 				{
-					PalabraACifrar = insertar(PalabraACifrar,Caracter,contador);
-					contador=contador+1;
-				} 
-			}
-			printf("La Palabra a cifrar es: \n");
-			mostrar(PalabraACifrar);
-			printf("\n");
-			
-			Codificar(PalabraACifrar);
-			printf("********** FIN DEL PROCESO DE CIFRADO **********\n");
-			fclose(Entrada);
-		}
-		else if(strncmp(Cabecera, Descifrado, 7) ==0)
-		{
-			printf("********** INICIO DEL PROCESO DE DESCIFRADO **********\n");
-			int contador2=0;
-			int contador3=0;
-			int linea=0;
-			int desfase2=0;
-			lista TextoADescifrar= crearLista();
-			lista AlfabetoUtilizado = crearLista();
-			while(!feof(Entrada))
-			{
-				fscanf(Entrada,"%c",&Caracter);
-				//printf("**%d**\n",Caracter);
-				if(Caracter == 10)
-				{
-					linea=linea+1;
-				}
-				
-				if(linea == 1)
-				{
-					fscanf(Entrada,"%d",&desfase2);
-//					printf("El desfase del Archivo leido es %d\n",desfase2);
-				}	
-				else if(linea ==2)
-				{
-					
-					if((Caracter >= 65 && Caracter <=90) || (Caracter >= 67 && Caracter <=122) || Caracter==32 ) 	// Solo se admiten Letras (mayUsculas o minUsculas)
+					for(e=0;e< Caracteres.fin;e++)
 					{
-						TextoADescifrar = insertar(TextoADescifrar,Caracter,contador2);
-						contador2=contador2+1;					
-					}					
-				}
-				else if(linea == 3)
-				{
-					if((Caracter >= 65 && Caracter <=90) || (Caracter >= 67 && Caracter <=122) || Caracter==32 ) 	// Solo se admiten Letras (mayUsculas o minUsculas)
-					{
-						//printf("Insertando -%c- en la posicion %d\n",Caracter,contador3);
-						AlfabetoUtilizado = insertar(AlfabetoUtilizado,Caracter,contador3);
-						contador3=contador3+1;					
-					}	
-				}
-			}
-			
-			printf("\nEL TEXTO A DESCIFRAR: ");
-			mostrar(TextoADescifrar);
-			
-			printf("La frase o palabra decodificada es: ");
-			mostrar(Decodificar(desfase2,TextoADescifrar,AlfabetoUtilizado));
-			printf("********** FIN DEL PROCESO DE DESCIFRADO **********\n");
-			fclose(Entrada);
+						for(f=0;f< Caracteres.fin;f++)
+						{
+							for(g=0;g< Caracteres.fin;g++)
+							{
+								for(h=0;h< Caracteres.fin;h++)
+								{
+									
+									//Se 'Concatena' a lista L1 el los caracteres que estan siendo permutados, contenidos en la lista Caracteres la cual es la entrada de la funcion 
+									//Se inserta en la posicion 0, el caracter en la posicion 'a' en la lista que contiene los caracteres a utilizar.
+									L1 = insertar(L1,Caracteres.arreglo[a].elemento,0);
+									//Se inserta en la posicion 1, el caracter en la posicion 'b' en la lista que contiene los caracteres a utilizar.
+									L1 = insertar(L1,Caracteres.arreglo[b].elemento,1);
+									//Se inserta en la posicion 2, el caracter en la posicion 'c' en la lista que contiene los caracteres a utilizar.
+									L1 = insertar(L1,Caracteres.arreglo[c].elemento,2);
+									//Se inserta en la posicion 3, el caracter en la posicion 'd' en la lista que contiene los caracteres a utilizar.
+									L1 = insertar(L1,Caracteres.arreglo[d].elemento,3);
+									//Se inserta en la posicion 4, el caracter en la posicion 'e' en la lista que contiene los caracteres a utilizar.
+									L1 = insertar(L1,Caracteres.arreglo[e].elemento,4);
+									//Se inserta en la posicion 5, el caracter en la posicion 'f' en la lista que contiene los caracteres a utilizar.
+									L1 = insertar(L1,Caracteres.arreglo[f].elemento,5);
+									//Se inserta en la posicion 6, el caracter en la posicion 'g' en la lista que contiene los caracteres a utilizar.
+									L1 = insertar(L1,Caracteres.arreglo[g].elemento,6);
+									//Se inserta en la posicion 7, el caracter en la posicion 'h' en la lista que contiene los caracteres a utilizar.
+									L1 = insertar(L1,Caracteres.arreglo[h].elemento,7);
+									
+									//Se agrega en la lista de listas resultado, en la ultima posicion disponible, la lista anteriormente creada con la combinacion correspondiente a esta iteraciOn.
+									Resultado = appendLista(L1, Resultado, CantidadListas);
+									
+									//Es necesario borrar todos los elementos de la lista L1, ya que provoca conflictos reutilizarla si no es borrada correctamente
+									L1=borrarLista(L1);							
+								}						
+							}
+						}				
+					}						
+				}				
+			}		
 		}
-		else
-		{
-			printf("No se encuentra la instrucciOn Intente con:\n-Cifrado\n-Descifrado\n");
-		} 
-		
+	}
+	
+    return Resultado;
+} 
+
+
+
+//Funcion que verifica que la lista de caracteres a utilizar, solo contenga caracteres validos.
+//Es decir, solo contenga digitos (0-9) y letras minUsculas.
+void verificarCaracteresValidos(lista Caracteres)
+{
+	int i;
+	for(i=0;i<Caracteres.fin;i++)
+	{
+		if(Caracteres.arreglo[i].elemento <=48 || (Caracteres.arreglo[i].elemento >=57 && Caracteres.arreglo[i].elemento <=97) || Caracteres.arreglo[i].elemento >=122)
+		{   
+			
+			printf("EL CARACTER INGRESADO NO ES VALIDO. Solo se permiten letras minUsculas y nUmeros del 0 al 9\n");
+			printf("A continuaciOn el programa se cerrarA \n");
+			getchar();
+			exit(0);
+		}
+	}
+}
+
+
+
+//Retorna 1 si el elemento a analizar es una vocal y -1 si es una consontante. O(n) = 1. T(n) = 14.
+int verificarVocal_Consonante(int elemento)   
+{
+    if(elemento==97 || elemento==101 || elemento==105 || elemento==111 || elemento==117)
+    {
+		// los numeros en esta bifurcacion representan las vocales minUsculas.
+        return 1;
+    }
+    else if(elemento >97 && elemento <=122)
+    {
+		//En esta bifurcacion representa todos los elementos que no son vocales y estan dentro de la numeracion 97 y 122 ASCII
+		//Es decir, son las consonantes minUsculas.
+		return -1;
 	}
 	else
 	{
-		printf("NO SE ENCUENTRA EL ARCHIVO");
+		//Si no corresponde a ninguno de los dos elementos anteriormente mencionados, el programa deberia finalizar.
+		return -2;
 	}
+}
 
+
+
+
+
+//Funcion que verifica que el elemento de entrada sea un Digito (0-9)
+//En caso de que efectivamente lo sea, retorna 1.
+//Caso contrario retorna -1.
+int verificarNumero09(int elemento)
+{
+	//En ASCII 48 corresponde a el char '0' y 57 corresponde a '9'
+	if(elemento>=48 && elemento <=57)
+	{
+		//Caso de Exito
+		return 1;
+	}
+	else
+	{
+		//Caso de Fracaso.
+		return -1;
+	}
+}
+
+//Funcion que verifica que el elemento ingresado corresponde a una letra
+int verificarLetra(int elemento)
+{
+	if (elemento>=97 && elemento <=122)
+	{
+		//Si el elemento efectivamente es una letra minuscula, retorna 1.
+		return 1;
+	}
+	else
+	{
+		//Caso contrario, retorna -1.
+		return -1;
+	}
+}
+
+
+//Funcion que verifica si los tres elementos ingresados son consonantes
+//En el caso que lo sean, la funcion retorna 1.
+//Caso contrario, retorna -1.
+int verificar3ConsonantesConsecutivas(int elemento1, int elemento2, int elemento3)
+{
+	//Se realiza la verificacion y se guarda en Resultado 1 2 y 3.
+	int resultado1 = verificarVocal_Consonante(elemento1);
+	int resultado2 = verificarVocal_Consonante(elemento2);
+	int resultado3 = verificarVocal_Consonante(elemento3);
+	//Se espera que el resultado del llamado de las 3 funciones sea -1, ya que por convenciOn es el resultado que esperamos cuando buscamos consonantes.
+	if( resultado1==-1 && resultado2==-1 && resultado3==-1)
+	{
+		//Caso de Exito. los 3 elementos ingresados son 
+		return 1;
+	}
+	
+	//Si uno de los 3 elementos no es una consonante, se retorna -1.
+	return -1;
+}
+
+
+//Funcion que verifica si los tres elementos ingresados son consonantes
+//En el caso que lo sean, la funcion retorna 1.
+//Caso contrario, retorna -1.
+int verificar3VocalesConsecutivas(int elemento1, int elemento2, int elemento3)
+{
+	//Se realiza la verificacion y se guarda en Resultado 1 2 y 3.
+	int resultado1 = verificarVocal_Consonante(elemento1);
+	int resultado2 = verificarVocal_Consonante(elemento2);
+	int resultado3 = verificarVocal_Consonante(elemento3);
+	//Se espera que el resultado del llamado de las 3 funciones sea -1, ya que por convenciOn es el resultado que esperamos cuando buscamos consonantes.
+	if(resultado1==1 && resultado2==1 && resultado3==1)
+	{
+		//Caso de Exito. los 3 elementos ingresados son 
+		return 1;
+	}
+	
+	//Si uno de los 3 elementos no es una consonante, se retorna -1.
+	return -1;
+}
+
+
+//Funcion que verifica si los tres elementos ingresados son consonantes
+//En el caso que lo sean, la funcion retorna 1.
+//Caso contrario, retorna -1.
+int verificar3LetrasConsecutivas(int elemento1, int elemento2, int elemento3)
+{
+	//Se realiza la verificacion y se guarda en Resultado 1 2 y 3.
+	int resultado1 = verificarLetra(elemento1);
+	int resultado2 = verificarLetra(elemento2);
+	int resultado3 = verificarLetra(elemento3);
+	//Se espera que el resultado del llamado de las 3 funciones sea -1, ya que por convenciOn es el resultado que esperamos cuando buscamos consonantes.
+	if(resultado1==1 && resultado2==1 && resultado3==1)
+	{
+		//Caso de Exito. los 3 elementos ingresados son letras.
+		return 1;
+	}
+	
+	//Si uno de los 3 elementos no es una consonante, se retorna -1.
+	return -1;
+}
+
+
+//Funcion que verifica si los tres elementos ingresados son consonantes
+//En el caso que lo sean, la funcion retorna 1.
+//Caso contrario, retorna -1.
+int verificar3NumerosConsecutivos(int elemento1, int elemento2, int elemento3)
+{
+	//Se realiza la verificacion y se guarda en Resultado 1 2 y 3.
+	int resultado1 = verificarNumero09(elemento1);
+	int resultado2 = verificarNumero09(elemento2);
+	int resultado3 = verificarNumero09(elemento3);
+	//Se espera que el resultado del llamado de las 3 funciones sea -1, ya que por convenciOn es el resultado que esperamos cuando buscamos consonantes.
+	if(resultado1==1 && resultado2==1 && resultado3==1)
+	{
+		//Caso de Exito. los 3 elementos ingresados son digitoss.
+		return 1;
+	}
+	
+	//Si uno de los 3 elementos no es una consonante, se retorna -1.
+	return -1;
+}
+
+
+
+
+
+//Condicion 1.1 que no existan 3 consonantes de forma consecutiva.
+//Condicion 1.2 
+//Se revisa toda la lista, en caso de encontrar 3 consonantes de forma consecutiva la funcion retorna -1.
+//Caso contrario, la funcion retorna 1.
+int condicion_1LetrasConsecutivas(lista combinacion)
+{
+	int i;
+	for (i=0;i<=combinacion.fin-3;i++)
+	{
+		//Se realiza la verificacion meidante la funciOn verificar3ConsonantesConsecutivas, si Esta funciOn retorna 1, entonces
+		//Quiere decir que ha encontrado 3 consonantes de forma consecutiva.
+		
+		if(verificar3LetrasConsecutivas(combinacion.arreglo[i].elemento,combinacion.arreglo[i+1].elemento,combinacion.arreglo[i+2].elemento)== 1)
+		{
+			//Caso de fracaso, esta combinaciOn no sirve ya que hay 3 letras de forma consecutiva.
+			//Se retorna -1 en caso de fracaso.
+			
+			//printf("3 consonantes consecutivas en las posiciones %d %d %d\n",i,i+1,i+2);
+			return -1;
+		}
+		else if(verificar3NumerosConsecutivos(combinacion.arreglo[i].elemento,combinacion.arreglo[i+1].elemento,combinacion.arreglo[i+2].elemento)== 1)
+		{
+			//Caso fracaso, esta combinacion no sirve ya que hay 3 nUmeros consecutivos
+			return -1;
+		}
+	}
+	//Caso de Exito
+	return 1;
+}
+
+//FunciOn que verifica que la combinaciOn a analizar, si comienza con un nUmero, Este no termine en un nUmero.
+//Y que si la funciOn comience con una letra, esta termine con un nUmero o una letra.
+int condicion_2ComienzoNumero(lista combinacion)
+{
+	//Condicion que verifique si los elementos iniciales y finales no sean un nUmero (al mismo tiempo).
+	if(verificarNumero09(combinacion.arreglo[0].elemento) == 1 && verificarNumero09(combinacion.arreglo[combinacion.fin-1].elemento) == -1)
+	{
+		//printf("Comienza con numero y no termina con numero\n");
+		return 1;
+	}
+/*	else if (verificarVocal_Consonante(combinacion.arreglo[0].elemento) == 1 && (verificarNumero09(combinacion.arreglo[combinacion.fin-1].elemento) == 1 || verificarVocal_Consonante(combinacion.arreglo[combinacion.fin-1].elemento) == 1))
+	{
+		
+		return 1;
+	}
+*/	
+	else
+	{
+		return -1;
+	}
+}
+
+//Funcion que verifica si la combinaciOn comienza con vocal
+int condicion_3ComienzoVocal(lista combinacion)
+{
+	//Si el elemento que ocupa la posiciOn 0, es un nUmero la funciOn retorna 1.
+	if(verificarVocal_Consonante(combinacion.arreglo[0].elemento) == 1)
+	{
+		return -1;
+	}
+	else
+	{
+		return 1;
+	}	
+}
+
+    
+lista * aplicarFiltro(lista * ListaCombinaciones, int * cantidadCombinaciones, int * cantidadCombinacionesValidas)
+{
+	int i;
+	lista * CombinacionesValidas;
+	
+	for(i=0;i<*cantidadCombinaciones;i++)
+	{
+		if(condicion_1LetrasConsecutivas(ListaCombinaciones[i])==1 && condicion_2ComienzoNumero( ListaCombinaciones[i]) ==1
+		&& condicion_3ComienzoVocal(ListaCombinaciones[i])==1)
+		{
+			
+			//Si la combinacion iterada cumple con todos los requisitos que expone nuestro problema
+			//Es agregada a nuestra lista que contiene las combinaciones vAlidas.
+			CombinacionesValidas = appendLista(ListaCombinaciones[i],CombinacionesValidas,cantidadCombinacionesValidas);					
+									
+		}  			
+	}
+	
+	return CombinacionesValidas;
+	
+}      
+void LeerArchivo() //Funcion que se encarga de leer un archivo y dar la intruccion de codificar o decodificar segun sea el caso
+{
+	FILE * Entrada;
+	Entrada = fopen("Entrada.in","r");
+	
+			
+	FILE * Salida;
+	Salida = fopen ("Salida.txt", "w");
+	
+	char Caracter;
+	lista Caracteres = crearLista();
+	int i;
+	
+	if(Entrada != NULL)
+	{
+		while(!feof(Entrada))
+		{
+			fscanf(Entrada,"%c",&Caracter);
+			//printf("-%d-\n",Caracter);
+			//Si el proximo caracter corresponde a un numero entre 0 y 9
+			//O a una letra minUscula, entonces se 
+			if( (Caracter >=48 && Caracter <=57) || (Caracter >=97 && Caracter <=122))
+			{
+				//Verificar que el caracter no estE repetido
+				//
+				//
+				//
+				
+				for(i=0;i<Caracteres.fin;i++)
+				{
+					if(Caracter == Caracteres.arreglo[i].elemento)
+					{
+						fprintf(Salida,"El Caracter %c se encuentra duplicado en el alfabeto a utilizar\n", Caracter);
+						fprintf(Salida,"No se puede utilizar el alfabeto ingresado\n");
+						fclose(Entrada);
+						fclose(Salida);
+						exit(0);
+					} 					
+				}				
+				Caracteres = append(Caracteres,Caracter);
+			}
+			 			
+		}
+		
+		fclose(Entrada);	
+			
+		lista * CombinacionesPosibles;
+		int * totalCombinaciones;
+		
+		totalCombinaciones = malloc(sizeof(int));
+		CombinacionesPosibles = fuerzaBrutaPassword(Caracteres,totalCombinaciones);
+		
+		//printf("Cantidad de Listas que contiene Resultado: %d\n",*totalCombinaciones);
+		//mostrarListaEnlazada(CombinacionesPosibles, *totalCombinaciones);
+		
+		
+		
+		lista * CombinacionesValidas;
+		int * totalCombinacionesValidas=malloc(sizeof(int));
+		*totalCombinacionesValidas = 0;
+		CombinacionesValidas=aplicarFiltro(CombinacionesPosibles,totalCombinaciones,totalCombinacionesValidas);	
+		
+		
+
+		fprintf(Salida, "Cantidad de Combinaciones Validas: -%d-\n",*totalCombinacionesValidas);
+		//mostrarListaEnlazada(CombinacionesValidas, *totalCombinacionesValidas);
+		imprimirArchivoListaBidimensional(Salida,CombinacionesValidas,*totalCombinacionesValidas);
+		
+		fclose(Salida);
+	
+		}
+		else
+		{
+			printf("NO SE ENCUENTRA EL ARCHIVO");
+		}
 }

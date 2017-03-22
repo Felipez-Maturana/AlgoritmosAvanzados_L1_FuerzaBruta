@@ -11,13 +11,17 @@
 lista crearLista() {
     lista nueva;
     int i;
-    for(i = 0; i < MAX_ARR; i++) {
+    for(i = 0; i < 8; i++) {
     nueva.arreglo[i].siguiente = LIBRE;
     }
     nueva.cabeza = NULO;
     nueva.fin = 0;
     return nueva;
 }
+
+
+
+
 
 int buscarLibre(lista actual) {
     int indice;
@@ -39,15 +43,21 @@ void mostrar(lista actual) {
     printf("\n\n");
 }
 
+
+
+
+
 lista insertar(lista actual, int elemento, int posicion)
 {
     int auxiliar = actual.cabeza;
     int cuenta = 0;
     int posicionLibre = buscarLibre(actual);
     if(posicion < 0 || posicion > actual.fin || posicion > MAX_ARR) {
+		printf("MAX ACTUAL\n");
         return actual;
     }
     if(posicionLibre == NULO) {
+		printf("TA NULO PAPI\n");
         return actual;
     }
     actual.arreglo[posicionLibre].elemento = elemento;
@@ -125,6 +135,20 @@ lista borrar(lista actual, int posicion) {
 int primero(lista actual) {
     return actual.cabeza;
 }
+
+lista borrarLista(lista L1)
+{
+	int indice = L1.fin;
+	
+	while(indice >=0)
+	{
+		L1=borrar(L1,indice);
+		indice-=1;
+	}
+	return L1;
+}
+
+
 
 int siguiente(lista actual, int posicion)
     {
