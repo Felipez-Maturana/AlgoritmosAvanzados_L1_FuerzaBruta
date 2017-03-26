@@ -40,7 +40,7 @@ void mostrar(lista actual) {
         printf("%c ", actual.arreglo[indice].elemento);
         indice = actual.arreglo[indice].siguiente;
     }
-    printf("\n\n");
+    printf("\n");
 }
 
 

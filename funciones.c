@@ -1,21 +1,22 @@
 #include "structs.h"
 #include <stdio.h>
-#include <string.h>
 
-
+//Funcion que se encarga de insertar en el ultimo lugar de una lista de listas ListaEnlazada, la lista L1 
 lista * appendLista(lista L1, lista * ListaEnlazada, int * CantidadElementos)
 {
+	//Se aumenta en uno la cantidad de elementos que posee esa lista
 	* CantidadElementos = *CantidadElementos + 1; 
 	
+	//Se asigna mAs memoria a la lista enlazada que contendrA las listas
 	ListaEnlazada = (lista *) realloc(ListaEnlazada,*CantidadElementos*sizeof(lista));
 	
+	//Se asigna en la posicion indicada, la lista L1
 	ListaEnlazada[*CantidadElementos-1] = L1;
 	
 	return ListaEnlazada;
 	
 }
-
-
+//Muestra por pantalla todos los elementos que se encuentran en la lista que contiene las listas de combinaciones
 void mostrarListaEnlazada(lista * ListaEnlazada, int CantidadElementos)
 {
 	int i;
@@ -26,6 +27,7 @@ void mostrarListaEnlazada(lista * ListaEnlazada, int CantidadElementos)
 	}
 }
 
+//Funcion que se encarga de escribir en el archivo de Salida la lista Combinacion
 void imprimirArchivoLista(FILE * archivoSalida, lista Combinacion)
 {
 	int indice = Combinacion.cabeza;
@@ -37,7 +39,7 @@ void imprimirArchivoLista(FILE * archivoSalida, lista Combinacion)
 }
 
 
-
+//O(n)=n^2
 void imprimirArchivoListaBidimensional(FILE * archivoSalida, lista * ListaEnlazada, int CantidadElementos)
 {
 	int i;
@@ -291,6 +293,7 @@ int verificar3NumerosConsecutivos(int elemento1, int elemento2, int elemento3)
 //Condicion 1.2 
 //Se revisa toda la lista, en caso de encontrar 3 consonantes de forma consecutiva la funcion retorna -1.
 //Caso contrario, la funcion retorna 1.
+//O(n)=n
 int condicion_1LetrasConsecutivas(lista combinacion)
 {
 	int i;
@@ -319,20 +322,23 @@ int condicion_1LetrasConsecutivas(lista combinacion)
 
 //FunciOn que verifica que la combinaciOn a analizar, si comienza con un nUmero, Este no termine en un nUmero.
 //Y que si la funciOn comience con una letra, esta termine con un nUmero o una letra.
+//O(n)=1
 int condicion_2ComienzoNumero(lista combinacion)
 {
 	//Condicion que verifique si los elementos iniciales y finales no sean un nUmero (al mismo tiempo).
 	if(verificarNumero09(combinacion.arreglo[0].elemento) == 1 && verificarNumero09(combinacion.arreglo[combinacion.fin-1].elemento) == -1)
 	{
 		//printf("Comienza con numero y no termina con numero\n");
-		return 1;
-	}
-/*	else if (verificarVocal_Consonante(combinacion.arreglo[0].elemento) == 1 && (verificarNumero09(combinacion.arreglo[combinacion.fin-1].elemento) == 1 || verificarVocal_Consonante(combinacion.arreglo[combinacion.fin-1].elemento) == 1))
-	{
 		
 		return 1;
 	}
-*/	
+	else if (verificarLetra(combinacion.arreglo[0].elemento) == 1) 
+//	&& (verificarNumero09(combinacion.arreglo[combinacion.fin-1].elemento) == 1 || verificarLetra(combinacion.arreglo[combinacion.fin-1].elemento) == 1))
+	{
+		
+		
+		return 1;
+	}
 	else
 	{
 		return -1;
@@ -340,6 +346,7 @@ int condicion_2ComienzoNumero(lista combinacion)
 }
 
 //Funcion que verifica si la combinaciOn comienza con vocal
+//O(n)=1
 int condicion_3ComienzoVocal(lista combinacion)
 {
 	//Si el elemento que ocupa la posiciOn 0, es un nUmero la funciOn retorna 1.
@@ -354,6 +361,9 @@ int condicion_3ComienzoVocal(lista combinacion)
 }
 
     
+//Funcion que recibe una lista que contiene la lista de combinaciones y somete a prueba cada una de ellas
+//Si la lista a analizar  efectivamente cumple con las 3 condiciones, se agrega a la lista resultados.
+//O(n)=n^2
 lista * aplicarFiltro(lista * ListaCombinaciones, int * cantidadCombinaciones, int * cantidadCombinacionesValidas)
 {
 	int i;
@@ -361,14 +371,14 @@ lista * aplicarFiltro(lista * ListaCombinaciones, int * cantidadCombinaciones, i
 	
 	for(i=0;i<*cantidadCombinaciones;i++)
 	{
-		if(condicion_1LetrasConsecutivas(ListaCombinaciones[i])==1 && condicion_2ComienzoNumero( ListaCombinaciones[i]) ==1
+		//Orden, n*(
+		if(condicion_1LetrasConsecutivas(ListaCombinaciones[i])==1 && condicion_2ComienzoNumero(ListaCombinaciones[i])==1
 		&& condicion_3ComienzoVocal(ListaCombinaciones[i])==1)
 		{
 			
 			//Si la combinacion iterada cumple con todos los requisitos que expone nuestro problema
 			//Es agregada a nuestra lista que contiene las combinaciones vAlidas.
-			CombinacionesValidas = appendLista(ListaCombinaciones[i],CombinacionesValidas,cantidadCombinacionesValidas);					
-									
+			CombinacionesValidas = appendLista(ListaCombinaciones[i],CombinacionesValidas,cantidadCombinacionesValidas);														
 		}  			
 	}
 	
@@ -382,7 +392,7 @@ void LeerArchivo() //Funcion que se encarga de leer un archivo y dar la intrucci
 	
 			
 	FILE * Salida;
-	Salida = fopen ("Salida.txt", "w");
+	Salida = fopen ("Salida.out", "w");
 	
 	char Caracter;
 	lista Caracteres = crearLista();
@@ -398,23 +408,44 @@ void LeerArchivo() //Funcion que se encarga de leer un archivo y dar la intrucci
 			//O a una letra minUscula, entonces se 
 			if( (Caracter >=48 && Caracter <=57) || (Caracter >=97 && Caracter <=122))
 			{
-				//Verificar que el caracter no estE repetido
-				//
-				//
-				//
-				
+				//Se Verifica que el caracter no estE repetido
+				//Para todos los caracteres obtenidos desde el archivo de entrada, que se encuentren
+				//En la Lista caracteres								
 				for(i=0;i<Caracteres.fin;i++)
 				{
+					//Si el caracter que se quiere ingresar ya estA en el arreglo
+					//el programa finaliza y sugiere que el alfabeto ingresado no se puede utilizar.
 					if(Caracter == Caracteres.arreglo[i].elemento)
 					{
+						//Se escribe en el archivo de salida. 
+						printf("No se puede utilizar el alfabeto ingresado, verifique el archivo Salida.out para obtener mAs informaciOn\n El programa se cerrarA, presione una tecla para continuar");
 						fprintf(Salida,"El Caracter %c se encuentra duplicado en el alfabeto a utilizar\n", Caracter);
 						fprintf(Salida,"No se puede utilizar el alfabeto ingresado\n");
+						//Se cierran ambos archivos.
 						fclose(Entrada);
 						fclose(Salida);
+						getchar();
 						exit(0);
 					} 					
 				}				
 				Caracteres = append(Caracteres,Caracter);
+			}
+			else if(Caracter == 10)
+			{
+				//Se ataja el salto de linea, no se hace nada
+			}
+			else
+			{
+				//Se escribe en el archivo de salida. 
+				printf("No se puede utilizar el alfabeto ingresado, verifique el archivo Salida.out para obtener mAs informaciOn\n El programa se cerrarA, presione una tecla para continuar");
+				
+				fprintf(Salida,"El Caracter %c no estA permitido para realizar combinaciones\n", Caracter);
+				fprintf(Salida,"No se puede utilizar el alfabeto ingresado\n");
+				//Se cierran ambos archivos.
+				fclose(Entrada);
+				fclose(Salida);
+				getchar();
+				exit(0);				
 			}
 			 			
 		}
@@ -424,8 +455,10 @@ void LeerArchivo() //Funcion que se encarga de leer un archivo y dar la intrucci
 		lista * CombinacionesPosibles;
 		int * totalCombinaciones;
 		
+
 		totalCombinaciones = malloc(sizeof(int));
 		CombinacionesPosibles = fuerzaBrutaPassword(Caracteres,totalCombinaciones);
+		//mostrarListaEnlazada(CombinacionesPosibles,*totalCombinaciones);
 		
 		//printf("Cantidad de Listas que contiene Resultado: %d\n",*totalCombinaciones);
 		//mostrarListaEnlazada(CombinacionesPosibles, *totalCombinaciones);
@@ -439,7 +472,7 @@ void LeerArchivo() //Funcion que se encarga de leer un archivo y dar la intrucci
 		
 		
 
-		fprintf(Salida, "Cantidad de Combinaciones Validas: -%d-\n",*totalCombinacionesValidas);
+		fprintf(Salida, "De un total de %d Combinaciones creadas, se han obtenido %d Combinaciones Validas.\n",*totalCombinaciones,*totalCombinacionesValidas);
 		//mostrarListaEnlazada(CombinacionesValidas, *totalCombinacionesValidas);
 		imprimirArchivoListaBidimensional(Salida,CombinacionesValidas,*totalCombinacionesValidas);
 		
@@ -448,6 +481,6 @@ void LeerArchivo() //Funcion que se encarga de leer un archivo y dar la intrucci
 		}
 		else
 		{
-			printf("NO SE ENCUENTRA EL ARCHIVO");
+			fprintf(Salida,"NO SE ENCUENTRA EL ARCHIVO QUE CONTIENE EL ALFABETO");
 		}
 }

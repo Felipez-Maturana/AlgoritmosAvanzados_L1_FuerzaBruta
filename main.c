@@ -7,7 +7,6 @@
 
 int main()
 {  
-	
     LeerArchivo();  
     return 0;
 }
